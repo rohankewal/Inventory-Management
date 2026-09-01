@@ -1,12 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 func main() {
-	var catalog []Product
-
-	// Seed data so it doesn't start empty
-	catalog = append(catalog, Product{ID: 1, Name: "Coffee Mug", Price: 12.50, Stock: 100})
+	db, err := InitDB("inventory.db")
+	if err != nil {
+		log.Fatalf("❌ Failed to connect to SQLite database: %v", err)
+	}
+	defer db.Close()
 
 	for {
 		fmt.Println("\n=========================")
@@ -22,11 +26,11 @@ func main() {
 
 		switch choice {
 		case 1:
-			DisplayCatalog(catalog)
+			DisplayCatalog(db)
 		case 2:
-			catalog = AddProduct(catalog)
+			AddProduct(db)
 		case 3:
-			catalog = RemoveProduct(catalog)
+			RemoveProduct(db)
 		case 4:
 			fmt.Println("\nExiting system. Goodbye!")
 			return // Terminates main() and exits the app
