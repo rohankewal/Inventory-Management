@@ -61,42 +61,19 @@ func DisplayCatalog(db *sql.DB) {
 	}
 }
 
-// AddProduct inserts a brand new row into the database
-func AddProduct(db *sql.DB) {
-	fmt.Println("\n--- Add New Product ---")
-	// Notice we no longer ask for ID, SQLite manages it automatically
-	name := readString("Enter Product Name: ")
-	price := readFloat("Enter Product Price: ")
-	stock := readInt("Enter Product Stock: ")
-
+// AddProduct now expects values to be passed directly from the GUI components
+func AddProduct(db *sql.DB, name string, price float64, stock int) error {
 	query := "INSERT INTO products (name, price, stock) VALUES (?, ?, ?)"
 	_, err := db.Exec(query, name, price, stock)
-	if err != nil {
-		fmt.Println("❌ Error saving product:", err)
-		return
-	}
-
-	fmt.Printf("✅ Product '%s' added and saved successfully.\n", name)
+	return err
 }
 
-// RemoveProduct runs a DELETE statement targeting a specific record ID
-func RemoveProduct(db *sql.DB) {
-	fmt.Println("\n--- Remove Product ---")
-	idToRemove := readInt("Enter the ID of the product to remove: ")
-
+// RemoveProduct takes the ID directly from the UI selection
+func RemoveProduct(db *sql.DB, id int) (int64, error) {
 	query := "DELETE FROM products WHERE id = ?"
-	result, err := db.Exec(query, idToRemove)
+	result, err := db.Exec(query, id)
 	if err != nil {
-		fmt.Println("❌ Error running delete statement:", err)
-		return
+		return 0, err
 	}
-
-	// Check if a row was actually impacted by the delete query
-	rowsAffected, _ := result.RowsAffected()
-	if rowsAffected == 0 {
-		fmt.Printf("❌ Error: Product with ID %d not found.\n", idToRemove)
-		return
-	}
-
-	fmt.Printf("✅ Product %d successfully removed from storage.\n", idToRemove)
+	return result.RowsAffected()
 }
