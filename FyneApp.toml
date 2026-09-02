@@ -1,0 +1,12 @@
+# Application metadata used by `fyne package` when building installers.
+# The signing and notarisation steps live in the release workflow; this file
+# only describes the app itself.
+
+Website = "https://example.com/inventory-sys"
+
+[Details]
+Icon = "build/icon.png"
+Name = "InventorySys"
+ID = "com.inventorysys.desktop"
+Version = "0.1.0"
+Build = 1

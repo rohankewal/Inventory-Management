@@ -1,0 +1,68 @@
+# Linter configuration.
+#
+# The set is chosen to catch the mistakes that actually cost time in this
+# codebase — unchecked errors around database and file handles, unused code
+# left behind during refactors, and SQL built by concatenation — without
+# flooding review with style noise.
+
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    - errcheck      # an ignored error from a DB call is a silent data problem
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - bodyclose
+    - errorlint     # errors.Is/As rather than == and type switches
+    - gosec
+    - misspell
+    - nilerr
+    - rowserrcheck  # a missed rows.Err() hides a truncated result set
+    - sqlclosecheck
+    - unconvert
+    - unparam
+    - revive
+
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: false
+    gosec:
+      excludes:
+        # Integer conversion warnings are noisy on deliberate int64 quantity
+        # arithmetic that is already range-checked at the domain boundary.
+        - G115
+    revive:
+      rules:
+        - name: exported
+          arguments: ["disableStutteringCheck"]
+        - name: package-comments
+        - name: indent-error-flow
+        - name: error-strings
+        - name: context-as-argument
+        - name: unreachable-code
+
+  exclusions:
+    rules:
+      # Test helpers legitimately ignore errors while unwinding, and hardcoded
+      # credentials warnings are meaningless against fixture data.
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gosec
+          - unparam
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/rohankewalramani/inventory-sys
